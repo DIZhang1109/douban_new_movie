@@ -9,11 +9,7 @@ import scrapy
 
 
 class DoubanNewMovieItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-
+    # Three fields that I want to save to the database
     movie_name = scrapy.Field()
     movie_star = scrapy.Field()
     movie_url = scrapy.Field()
-
-    pass

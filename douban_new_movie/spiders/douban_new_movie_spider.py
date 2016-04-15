@@ -8,9 +8,6 @@ class DoubanNewMovieSpider(Spider):
     # Spider's name
     name = 'douban_new_movie_spider'
 
-    # Spider website's domain URL
-    allowed_domains = ['movie.douban.com']
-
     # Spider's URL
     start_urls = ['http://movie.douban.com/chart']
 

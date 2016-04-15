@@ -4,8 +4,7 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
-import json
-import codecs
+import pymongo
 import sys
 
 reload(sys)
@@ -13,25 +12,30 @@ sys.setdefaultencoding('utf-8')
 
 
 class DoubanNewMoviePipeline(object):
-    # Open the json file
+    # Define mongoDB properties
     def __init__(self):
-        self.file = codecs.open('douban_new_movie.json', mode='wb', encoding='utf-8')
+        self.mongo_url = 'localhost'
+        self.mongo_port = 27017
+        self.db_name = 'douban_new_movies'
+        self.connection_name = 'contents'
 
-    # Process the items
-    def process_item(self, item, spider):
-        line = 'the new movie list:' + '\n'
+    # Open mongoDB
+    def open_spider(self, spider):
+        self.client = pymongo.MongoClient(self.mongo_url, self.mongo_port)
+        self.db = self.client[self.db_name]
+        self.con = self.db[self.connection_name]
 
-        for i in range(len(item['movie_name'])):
-            movie_name = {'movie_name': str(item['movie_name'][i]).replace('', '')}
-            movie_star = {'movie_star': item['movie_star'][i]}
-            movie_url = {'movie_url': item['movie_url'][i]}
-            line = line + json.dumps(movie_name, ensure_ascii=False)
-            line = line + json.dumps(movie_star, ensure_ascii=False)
-            line = line + json.dumps(movie_url, ensure_ascii=False) + '\n'
-
-        # Write into file
-        self.file.write(line)
-
-    # Close the file
+    # Close mongoDB
     def close_spider(self, spider):
-        self.file.close()
+        self.client.close()
+
+    # Process the items to insert three items into mongoDB
+    def process_item(self, item, spider):
+        for i in range(len(item['movie_name'])):
+            self.con.insert_one(
+                {
+                    'movie_name': str(item['movie_name'][i].replace('', '')),
+                    'movie_star': item['movie_star'][i],
+                    'movie_url': item['movie_url'][i]
+                }
+            )
