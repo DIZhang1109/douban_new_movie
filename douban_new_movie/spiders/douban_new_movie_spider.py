@@ -9,7 +9,7 @@ class DoubanNewMovieSpider(Spider):
     name = 'douban_new_movie_spider'
 
     # Spider's URL
-    start_urls = ['http://movie.douban.com/chart']
+    start_urls = ['https://movie.douban.com/chart']
 
     # Spider's function
     def parse(self, response):
@@ -25,6 +25,9 @@ class DoubanNewMovieSpider(Spider):
         item['movie_name'] = [n.encode('utf-8') for n in movie_name]
         item['movie_star'] = [n for n in movie_star]
         item['movie_url'] = [n for n in movie_url]
+
+        # Print to the console
+        print item
 
         # Yield item and give it to pipelines
         yield item
